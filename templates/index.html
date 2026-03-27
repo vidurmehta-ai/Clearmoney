@@ -6,173 +6,85 @@
 <title>ClearMoney Weekly — Content Generator</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #13131a;
-    --surface2: #1c1c26;
-    --border: #2a2a38;
-    --accent: #00e5a0;
-    --accent2: #7c6aff;
-    --accent3: #ff6a6a;
-    --text: #f0f0f8;
-    --muted: #7a7a9a;
-    --card: #16161f;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-  }
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,229,160,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,229,160,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .container { max-width: 860px; margin: 0 auto; padding: 40px 24px; position: relative; z-index: 1; }
-  .header { margin-bottom: 40px; }
-  .logo-row { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
-  .logo-icon {
-    width: 44px; height: 44px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; flex-shrink: 0;
-  }
-  h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: 28px; font-weight: 800; letter-spacing: -0.5px;
-    background: linear-gradient(90deg, var(--text), var(--accent));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  }
-  .subtitle { color: var(--muted); font-size: 14px; font-weight: 300; margin-left: 58px; }
-  .segment-row { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
-  .seg-label { font-size: 13px; color: var(--muted); align-self: center; margin-right: 4px; }
-  .seg-btn {
-    padding: 8px 18px; border-radius: 20px;
-    border: 1px solid var(--border); background: var(--surface);
-    color: var(--muted); font-family: 'DM Sans', sans-serif;
-    font-size: 13px; cursor: pointer; transition: all 0.2s;
-  }
-  .seg-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .seg-btn.active { background: rgba(0,229,160,0.1); border-color: var(--accent); color: var(--accent); }
-  .gen-btn {
-    width: 100%; padding: 18px;
-    background: linear-gradient(135deg, var(--accent), #00b87a);
-    border: none; border-radius: 14px;
-    color: #0a0a0f; font-family: 'Syne', sans-serif;
-    font-size: 16px; font-weight: 700; cursor: pointer;
-    transition: all 0.25s; margin-bottom: 28px; letter-spacing: 0.3px;
-  }
-  .gen-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0,229,160,0.25); }
-  .gen-btn:active { transform: translateY(0); }
-  .gen-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-  .loading { display: none; text-align: center; padding: 48px; color: var(--muted); font-size: 14px; }
-  .loading.show { display: block; }
-  .spinner {
-    width: 36px; height: 36px;
-    border: 2px solid var(--border); border-top-color: var(--accent);
-    border-radius: 50%; animation: spin 0.8s linear infinite;
-    margin: 0 auto 16px;
-  }
-  .output { display: none; }
-  .output.show { display: block; }
-  .section {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 16px; margin-bottom: 20px; overflow: hidden;
-    transition: border-color 0.2s;
-  }
-  .section:hover { border-color: rgba(0,229,160,0.2); }
-  .section-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 20px; border-bottom: 1px solid var(--border);
-    background: var(--surface);
-  }
-  .section-label {
-    display: flex; align-items: center; gap: 10px;
-    font-family: 'Syne', sans-serif; font-size: 12px;
-    font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted);
-  }
-  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .dot-green { background: var(--accent); }
-  .dot-purple { background: var(--accent2); }
-  .dot-yellow { background: #ffd166; }
-  .dot-blue { background: #6af4ff; }
-  .dot-red { background: var(--accent3); }
-  .copy-btn {
-    padding: 6px 14px; background: transparent;
-    border: 1px solid var(--border); border-radius: 8px;
-    color: var(--muted); font-family: 'DM Sans', sans-serif;
-    font-size: 12px; cursor: pointer; transition: all 0.2s;
-  }
-  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .copy-btn.copied { border-color: var(--accent); color: var(--accent); background: rgba(0,229,160,0.08); }
-  .section-body { padding: 20px; }
-  .hook-text {
-    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700;
-    line-height: 1.3; color: var(--text);
-    border-left: 3px solid var(--accent); padding-left: 16px;
-  }
-  .slides-grid { display: grid; gap: 10px; }
-  .slide-item {
-    background: var(--surface2); border-radius: 10px;
-    padding: 14px 16px; display: flex; gap: 14px; align-items: flex-start;
-  }
-  .slide-num {
-    width: 26px; height: 26px;
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    border-radius: 7px; display: flex; align-items: center; justify-content: center;
-    font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
-    color: #fff; flex-shrink: 0;
-  }
-  .slide-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-  .slide-body { font-size: 13px; color: var(--muted); line-height: 1.5; font-weight: 300; }
-  .caption-text { font-size: 14px; line-height: 1.8; color: var(--text); font-weight: 300; white-space: pre-wrap; }
-  .hashtag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
-  .hashtag {
-    padding: 5px 12px; background: var(--surface2);
-    border: 1px solid var(--border); border-radius: 20px;
-    font-size: 12px; color: var(--accent2);
-  }
-  .affiliate-card { display: flex; align-items: flex-start; gap: 14px; }
-  .aff-icon {
-    width: 42px; height: 42px;
-    background: rgba(255,166,0,0.1); border: 1px solid rgba(255,166,0,0.2);
-    border-radius: 10px; display: flex; align-items: center; justify-content: center;
-    font-size: 20px; flex-shrink: 0;
-  }
-  .aff-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-  .aff-desc { font-size: 13px; color: var(--muted); line-height: 1.5; font-weight: 300; }
-  .aff-commission {
-    display: inline-block; margin-top: 8px; padding: 3px 10px;
-    background: rgba(255,209,102,0.1); border: 1px solid rgba(255,209,102,0.2);
-    border-radius: 20px; font-size: 12px; color: #ffd166; font-weight: 500;
-  }
-  .tip-box {
-    background: rgba(124,106,255,0.06); border: 1px solid rgba(124,106,255,0.2);
-    border-radius: 12px; padding: 14px 18px; margin-bottom: 20px;
-    font-size: 13px; color: var(--muted); line-height: 1.6;
-  }
-  .tip-box strong { color: var(--accent2); }
-  .error-box {
-    display: none; background: rgba(255,106,106,0.08);
-    border: 1px solid rgba(255,106,106,0.2); border-radius: 12px;
-    padding: 16px 20px; margin-bottom: 20px;
-    font-size: 14px; color: var(--accent3);
-  }
-  .error-box.show { display: block; }
-  .footer {
-    text-align: center; color: var(--muted); font-size: 12px;
-    margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border); font-weight: 300;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+:root{--bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c26;--border:#2a2a38;--accent:#00e5a0;--accent2:#7c6aff;--accent3:#ff6a6a;--text:#f0f0f8;--muted:#7a7a9a;--card:#16161f}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,160,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.container{max-width:860px;margin:0 auto;padding:40px 24px;position:relative;z-index:1}
+.header{margin-bottom:32px}
+.logo-row{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.logo-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+h1{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:-0.5px;background:linear-gradient(90deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.subtitle{color:var(--muted);font-size:14px;font-weight:300;margin-left:58px}
+.trend-bar{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 18px;margin-bottom:24px;font-size:13px}
+.trend-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s ease infinite;flex-shrink:0}
+.trend-label{color:var(--muted);}
+.trend-topic{color:var(--accent);font-weight:500;flex:1}
+.refresh-btn{padding:5px 12px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:12px;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif}
+.refresh-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:24px}
+.tab{flex:1;padding:10px;border:none;background:transparent;color:var(--muted);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border-radius:9px;transition:all 0.2s;letter-spacing:0.3px}
+.tab.active{background:var(--surface2);color:var(--text)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.segment-row{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.seg-label{font-size:13px;color:var(--muted);margin-right:4px}
+.seg-btn{padding:8px 18px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s}
+.seg-btn:hover{border-color:var(--accent);color:var(--accent)}
+.seg-btn.active{background:rgba(0,229,160,0.1);border-color:var(--accent);color:var(--accent)}
+.gen-btn{width:100%;padding:18px;background:linear-gradient(135deg,var(--accent),#00b87a);border:none;border-radius:14px;color:#0a0a0f;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all 0.25s;margin-bottom:20px;letter-spacing:0.3px}
+.gen-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,229,160,0.25)}
+.gen-btn:active{transform:translateY(0)}
+.gen-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.batch-btn{width:100%;padding:18px;background:linear-gradient(135deg,var(--accent2),#5a4adf);border:none;border-radius:14px;color:#fff;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all 0.25s;margin-bottom:20px;letter-spacing:0.3px}
+.batch-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(124,106,255,0.25)}
+.batch-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.progress-wrap{display:none;margin-bottom:20px}
+.progress-wrap.show{display:block}
+.progress-bar-bg{background:var(--surface2);border-radius:20px;height:8px;overflow:hidden;margin-bottom:8px}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:20px;transition:width 0.3s;width:0%}
+.progress-text{font-size:13px;color:var(--muted);text-align:center}
+.progress-log{max-height:120px;overflow-y:auto;font-size:12px;color:var(--muted);background:var(--surface);border-radius:8px;padding:10px;margin-top:8px}
+.loading{display:none;text-align:center;padding:40px;color:var(--muted);font-size:14px}
+.loading.show{display:block}
+.spinner{width:36px;height:36px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
+.output{display:none}.output.show{display:block}
+.action-btns{display:flex;gap:12px;margin-bottom:20px}
+.action-btn{flex:1;padding:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;border-radius:12px;cursor:pointer;transition:all 0.2s;text-align:center}
+.action-btn:hover{border-color:var(--accent);color:var(--accent)}
+.dl-btn{display:none;width:100%;padding:16px;background:var(--surface2);border:1px solid var(--accent);color:var(--accent);font-family:'Syne',sans-serif;font-size:15px;font-weight:700;border-radius:14px;text-align:center;text-decoration:none;margin-bottom:20px;cursor:pointer;transition:all 0.2s}
+.dl-btn:hover{background:rgba(0,229,160,0.1)}
+.section{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:16px;overflow:hidden;transition:border-color 0.2s}
+.section:hover{border-color:rgba(0,229,160,0.2)}
+.section-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface)}
+.section-label{display:flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot-green{background:var(--accent)}.dot-purple{background:var(--accent2)}.dot-yellow{background:#ffd166}.dot-blue{background:#6af4ff}.dot-red{background:var(--accent3)}
+.copy-btn{padding:6px 14px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all 0.2s}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+.copy-btn.copied{border-color:var(--accent);color:var(--accent);background:rgba(0,229,160,0.08)}
+.section-body{padding:20px}
+.hook-text{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;line-height:1.3;color:var(--text);border-left:3px solid var(--accent);padding-left:16px}
+.slides-grid{display:grid;gap:10px}
+.slide-item{background:var(--surface2);border-radius:10px;padding:14px 16px;display:flex;gap:14px;align-items:flex-start}
+.slide-num{width:26px;height:26px;background:linear-gradient(135deg,var(--accent2),var(--accent));border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.slide-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.slide-body{font-size:13px;color:var(--muted);line-height:1.5;font-weight:300}
+.caption-text{font-size:14px;line-height:1.8;color:var(--text);font-weight:300;white-space:pre-wrap}
+.hashtag-cloud{display:flex;flex-wrap:wrap;gap:8px}
+.hashtag{padding:5px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:12px;color:var(--accent2)}
+.aff-card{display:flex;align-items:flex-start;gap:14px}
+.aff-icon{width:42px;height:42px;background:rgba(255,166,0,0.1);border:1px solid rgba(255,166,0,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.aff-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+.aff-desc{font-size:13px;color:var(--muted);line-height:1.5;font-weight:300}
+.aff-commission{display:inline-block;margin-top:8px;padding:3px 10px;background:rgba(255,209,102,0.1);border:1px solid rgba(255,209,102,0.2);border-radius:20px;font-size:12px;color:#ffd166;font-weight:500}
+.tip-box{background:rgba(124,106,255,0.06);border:1px solid rgba(124,106,255,0.2);border-radius:12px;padding:14px 18px;margin-bottom:16px;font-size:13px;color:var(--muted);line-height:1.6}
+.tip-box strong{color:var(--accent2)}
+.error-box{display:none;background:rgba(255,106,106,0.08);border:1px solid rgba(255,106,106,0.2);border-radius:12px;padding:16px 20px;margin-bottom:16px;font-size:14px;color:var(--accent3)}
+.error-box.show{display:block}
+.topic-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);border-radius:20px;padding:6px 14px;font-size:13px;color:var(--accent);margin-bottom:16px}
+.footer{text-align:center;color:var(--muted);font-size:12px;margin-top:40px;padding-top:20px;border-top:1px solid var(--border);font-weight:300}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 </style>
 </head>
 <body>
@@ -185,179 +97,251 @@
     <p class="subtitle">Instagram Carousel Generator — USA Personal Finance</p>
   </div>
 
-  <div class="segment-row">
-    <span class="seg-label">Audience:</span>
-    <button class="seg-btn active" data-seg="beginner" onclick="selectSeg(this)">🌱 Beginner</button>
-    <button class="seg-btn" data-seg="young_pro" onclick="selectSeg(this)">💼 Young Professional</button>
-    <button class="seg-btn" data-seg="freedom" onclick="selectSeg(this)">🚀 Financial Freedom</button>
+  <!-- Trend Bar -->
+  <div class="trend-bar">
+    <div class="trend-dot"></div>
+    <span class="trend-label">This week's top trend:</span>
+    <span class="trend-topic" id="trendTopic">{{ last_trend }}</span>
+    <span style="color:var(--muted);font-size:12px">{{ trend_count }} topics loaded</span>
+    <button class="refresh-btn" onclick="refreshTrends()">↻ Refresh</button>
   </div>
 
-  <button class="gen-btn" id="genBtn" onclick="generate()">⚡ Generate Today's Carousel</button>
-
-  <div class="error-box" id="errorBox"></div>
-  <div class="loading" id="loading">
-    <div class="spinner"></div>
-    Writing your carousel in human tone...
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('single',this)">⚡ Single Carousel</button>
+    <button class="tab" onclick="switchTab('batch',this)">📅 30-Day Batch</button>
   </div>
 
-  <div class="output" id="output">
-    <div class="tip-box" id="postingTip"></div>
-
-    <div class="section">
-      <div class="section-header">
-        <div class="section-label"><span class="dot dot-green"></span>Slide 1 — Hook</div>
-        <button class="copy-btn" onclick="copyEl('hookText', this)">Copy</button>
-      </div>
-      <div class="section-body"><div class="hook-text" id="hookText"></div></div>
+  <!-- Single Tab -->
+  <div class="tab-panel active" id="tab-single">
+    <div class="segment-row">
+      <span class="seg-label">Audience:</span>
+      <button class="seg-btn active" data-seg="beginner" onclick="selectSeg(this,'single')">🌱 Beginner</button>
+      <button class="seg-btn" data-seg="young_pro" onclick="selectSeg(this,'single')">💼 Young Pro</button>
+      <button class="seg-btn" data-seg="freedom" onclick="selectSeg(this,'single')">🚀 Freedom</button>
     </div>
+    <button class="gen-btn" id="genBtn" onclick="generateSingle()">⚡ Generate Today's Carousel</button>
+    <div class="error-box" id="errorBox"></div>
+    <div class="loading" id="loading"><div class="spinner"></div>Generating carousel from trending topics...</div>
 
-    <div class="section">
-      <div class="section-header">
-        <div class="section-label"><span class="dot dot-purple"></span>Slides 2–9 — Content</div>
-        <button class="copy-btn" onclick="copyEl('slidesRaw', this)">Copy All</button>
+    <div class="output" id="output">
+      <div class="topic-badge" id="topicBadge">📈 <span id="topicText"></span></div>
+      <div class="tip-box" id="postingTip"></div>
+      <div class="action-btns">
+        <button class="action-btn" onclick="generateSingle()">⚡ Generate Another</button>
+        <button class="action-btn" onclick="switchTab('batch', document.querySelector('.tab:nth-child(2))'))">📅 Switch to Batch</button>
       </div>
-      <div class="section-body">
-        <div class="slides-grid" id="slidesGrid"></div>
-        <div id="slidesRaw" style="display:none"></div>
-      </div>
-    </div>
+      <a class="dl-btn" id="dlBtn" href="#" download>⬇️ Download Carousel ZIP — 9 Images Ready</a>
 
-    <div class="section">
-      <div class="section-header">
-        <div class="section-label"><span class="dot dot-yellow"></span>Caption</div>
-        <button class="copy-btn" onclick="copyEl('captionText', this)">Copy</button>
+      <div class="section">
+        <div class="section-header"><div class="section-label"><span class="dot dot-green"></span>Slide 1 — Hook</div><button class="copy-btn" onclick="copyEl('hookText',this)">Copy</button></div>
+        <div class="section-body"><div class="hook-text" id="hookText"></div></div>
       </div>
-      <div class="section-body"><div class="caption-text" id="captionText"></div></div>
-    </div>
-
-    <div class="section">
-      <div class="section-header">
-        <div class="section-label"><span class="dot dot-blue"></span>Hashtags</div>
-        <button class="copy-btn" onclick="copyEl('hashtagsRaw', this)">Copy</button>
+      <div class="section">
+        <div class="section-header"><div class="section-label"><span class="dot dot-purple"></span>Slides 2–9 — Content</div><button class="copy-btn" onclick="copyEl('slidesRaw',this)">Copy All</button></div>
+        <div class="section-body"><div class="slides-grid" id="slidesGrid"></div><div id="slidesRaw" style="display:none"></div></div>
       </div>
-      <div class="section-body">
-        <div class="hashtag-cloud" id="hashtagCloud"></div>
-        <div id="hashtagsRaw" style="display:none"></div>
+      <div class="section">
+        <div class="section-header"><div class="section-label"><span class="dot dot-yellow"></span>Caption</div><button class="copy-btn" onclick="copyEl('captionText',this)">Copy</button></div>
+        <div class="section-body"><div class="caption-text" id="captionText"></div></div>
       </div>
-    </div>
-
-    <div class="section">
-      <div class="section-header">
-        <div class="section-label"><span class="dot dot-red"></span>Today's Affiliate Pick</div>
-        <button class="copy-btn" onclick="copyEl('affCta', this)">Copy CTA</button>
+      <div class="section">
+        <div class="section-header"><div class="section-label"><span class="dot dot-blue"></span>Hashtags</div><button class="copy-btn" onclick="copyEl('hashtagsRaw',this)">Copy</button></div>
+        <div class="section-body"><div class="hashtag-cloud" id="hashtagCloud"></div><div id="hashtagsRaw" style="display:none"></div></div>
       </div>
-      <div class="section-body">
-        <div class="affiliate-card">
-          <div class="aff-icon" id="affIcon"></div>
-          <div>
-            <div class="aff-name" id="affName"></div>
-            <div class="aff-desc" id="affDesc"></div>
-            <div class="aff-commission" id="affCommission"></div>
-          </div>
-        </div>
-        <div id="affCta" style="display:none"></div>
+      <div class="section">
+        <div class="section-header"><div class="section-label"><span class="dot dot-red"></span>Affiliate Pick</div><button class="copy-btn" onclick="copyEl('affCta',this)">Copy CTA</button></div>
+        <div class="section-body"><div class="aff-card"><div class="aff-icon" id="affIcon"></div><div><div class="aff-name" id="affName"></div><div class="aff-desc" id="affDesc"></div><div class="aff-commission" id="affCommission"></div></div></div><div id="affCta" style="display:none"></div></div>
       </div>
     </div>
   </div>
-<a id="dlBtn" style="display:none;width:100%;padding:16px;background:#00e5a0;color:#0a0a0f;font-family:Syne,sans-serif;font-weight:700;font-size:16px;border-radius:14px;text-align:center;text-decoration:none;margin-bottom:28px;display:none;cursor:pointer;" >⬇️ Download Carousel ZIP (9 Images Ready)</a>
-  <div class="footer">ClearMoney Weekly © 2026 — Powered by Claude AI</div>
+
+  <!-- Batch Tab -->
+  <div class="tab-panel" id="tab-batch">
+    <div class="segment-row">
+      <span class="seg-label">Audience:</span>
+      <button class="seg-btn active" data-seg="beginner" onclick="selectSeg(this,'batch')">🌱 Beginner</button>
+      <button class="seg-btn" data-seg="young_pro" onclick="selectSeg(this,'batch')">💼 Young Pro</button>
+      <button class="seg-btn" data-seg="freedom" onclick="selectSeg(this,'batch')">🚀 Freedom</button>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:20px;font-size:13px;color:var(--muted);line-height:1.6">
+      Generates <strong style="color:var(--text)">30 unique carousels</strong> based on trending topics. Each carousel has 9 slides, ready to post daily. Cost: ~$0.30 in API credits.
+    </div>
+    <button class="batch-btn" id="batchBtn" onclick="generateBatch()">📅 Generate 30-Day Content Pack</button>
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+      <div class="progress-text" id="progressText">Starting...</div>
+      <div class="progress-log" id="progressLog"></div>
+    </div>
+    <a class="dl-btn" id="batchDlBtn" href="#" download style="display:none">⬇️ Download 30-Day Pack — All 270 Images Ready</a>
+    <div class="error-box" id="batchError"></div>
+  </div>
+
+  <div class="footer">ClearMoney Weekly © 2026 — Powered by Claude AI + Perplexity Trends</div>
 </div>
 
 <script>
-let activeSeg = 'beginner';
+let activeSeg = {single:'beginner', batch:'beginner'};
 
-function selectSeg(btn) {
-  document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  activeSeg = btn.dataset.seg;
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(btn && btn.classList) btn.classList.add('active');
 }
 
-async function generate() {
+function selectSeg(btn, mode) {
+  btn.closest('.segment-row').querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeSeg[mode] = btn.dataset.seg;
+}
+
+async function refreshTrends() {
+  const btn = event.target;
+  btn.textContent = '↻ Refreshing...';
+  btn.disabled = true;
+  try {
+    const res = await fetch('/refresh-trends', {method:'POST'});
+    const data = await res.json();
+    if(data.success) {
+      document.getElementById('trendTopic').textContent = data.topics[0] || 'Updated';
+    }
+  } catch(e) { console.error(e); }
+  btn.textContent = '↻ Refresh';
+  btn.disabled = false;
+}
+
+async function generateSingle() {
   const btn = document.getElementById('genBtn');
   const loading = document.getElementById('loading');
   const output = document.getElementById('output');
   const errorBox = document.getElementById('errorBox');
-
-  btn.disabled = true;
-  btn.textContent = 'Generating...';
+  btn.disabled = true; btn.textContent = 'Generating...';
   loading.classList.add('show');
   output.classList.remove('show');
   errorBox.classList.remove('show');
-
+  document.getElementById('dlBtn').style.display = 'none';
   try {
     const res = await fetch('/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ segment: activeSeg })
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({segment: activeSeg.single})
     });
-
     const data = await res.json();
-
-    if (!res.ok || data.error) {
-      throw new Error(data.error || 'Something went wrong. Please try again.');
-    }
-
-    render(data);
-
-  } catch(err) {
-    errorBox.textContent = '⚠️ ' + err.message;
+    if(!res.ok || data.error) throw new Error(data.error || 'Something went wrong.');
+    renderSingle(data);
+  } catch(e) {
+    errorBox.textContent = '⚠️ ' + e.message;
     errorBox.classList.add('show');
   } finally {
-    btn.disabled = false;
-    btn.textContent = '⚡ Generate Today\'s Carousel';
+    btn.disabled = false; btn.textContent = '⚡ Generate Today\'s Carousel';
     loading.classList.remove('show');
   }
 }
 
-function render(data) {
+function renderSingle(data) {
+  document.getElementById('topicText').textContent = data.topic;
   document.getElementById('postingTip').innerHTML = '<strong>📅 Posting Tip:</strong> ' + data.posting_tip;
   document.getElementById('hookText').textContent = data.hook;
-
   const grid = document.getElementById('slidesGrid');
-  grid.innerHTML = '';
-  let raw = '';
-  data.slides.forEach((s, i) => {
-    const div = document.createElement('div');
-    div.className = 'slide-item';
+  grid.innerHTML = ''; let raw = '';
+  data.slides.forEach((s,i) => {
+    const div = document.createElement('div'); div.className = 'slide-item';
     div.innerHTML = `<div class="slide-num">${i+2}</div><div><div class="slide-title">${s.title}</div><div class="slide-body">${s.body}</div></div>`;
-    grid.appendChild(div);
-    raw += `Slide ${i+2}: ${s.title}\n${s.body}\n\n`;
+    grid.appendChild(div); raw += `Slide ${i+2}: ${s.title}\n${s.body}\n\n`;
   });
   document.getElementById('slidesRaw').textContent = raw.trim();
   document.getElementById('captionText').textContent = data.caption;
-
-  const cloud = document.getElementById('hashtagCloud');
-  cloud.innerHTML = '';
-  let hraw = '';
+  const cloud = document.getElementById('hashtagCloud'); cloud.innerHTML = ''; let hraw = '';
   data.hashtags.forEach(h => {
     const tag = h.startsWith('#') ? h : '#'+h;
-    const span = document.createElement('span');
-    span.className = 'hashtag';
-    span.textContent = tag;
-    cloud.appendChild(span);
-    hraw += tag + ' ';
+    const span = document.createElement('span'); span.className = 'hashtag'; span.textContent = tag;
+    cloud.appendChild(span); hraw += tag + ' ';
   });
   document.getElementById('hashtagsRaw').textContent = hraw.trim();
-
   const aff = data.affiliate;
   document.getElementById('affIcon').textContent = aff.icon;
   document.getElementById('affName').textContent = aff.name;
   document.getElementById('affDesc').textContent = aff.desc;
   document.getElementById('affCommission').textContent = '💰 ' + aff.commission;
   document.getElementById('affCta').textContent = aff.cta;
-
+  const dlBtn = document.getElementById('dlBtn');
+  dlBtn.href = '/download/' + data.zip_token;
+  dlBtn.style.display = 'block';
   document.getElementById('output').classList.add('show');
-  document.getElementById('output').scrollIntoView({ behavior: 'smooth' });
-  document.getElementById('dlBtn').style.display = 'block';
-document.getElementById('dlBtn').href = '/download/' + data.zip_token;
+  document.getElementById('output').scrollIntoView({behavior:'smooth'});
+}
+
+async function generateBatch() {
+  const btn = document.getElementById('batchBtn');
+  const progressWrap = document.getElementById('progressWrap');
+  const progressFill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+  const progressLog  = document.getElementById('progressLog');
+  const batchError   = document.getElementById('batchError');
+  const batchDlBtn   = document.getElementById('batchDlBtn');
+
+  btn.disabled = true; btn.textContent = 'Generating 30 days...';
+  progressWrap.classList.add('show');
+  batchError.classList.remove('show');
+  batchDlBtn.style.display = 'none';
+  progressLog.innerHTML = '';
+  progressFill.style.width = '0%';
+  progressText.textContent = 'Starting...';
+
+  try {
+    const res = await fetch('/batch', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({segment: activeSeg.batch})
+    });
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while(true) {
+      const {done, value} = await reader.read();
+      if(done) break;
+      buffer += decoder.decode(value, {stream:true});
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      for(const line of lines) {
+        if(!line.startsWith('data:')) continue;
+        const json = line.replace('data:','').trim();
+        if(!json) continue;
+        try {
+          const ev = JSON.parse(json);
+          if(ev.day === 'done') {
+            progressFill.style.width = '100%';
+            progressText.textContent = '✅ All 30 days complete!';
+            batchDlBtn.href = '/download/' + ev.token;
+            batchDlBtn.style.display = 'block';
+            batchDlBtn.scrollIntoView({behavior:'smooth'});
+          } else {
+            const pct = (ev.day / 30 * 100).toFixed(0);
+            progressFill.style.width = pct + '%';
+            progressText.textContent = `Day ${ev.day} of 30 — ${ev.topic}`;
+            const log = document.createElement('div');
+            log.textContent = `Day ${ev.day}: ${ev.topic} ${ev.status === 'ok' ? '✓' : '✗'}`;
+            log.style.color = ev.status === 'ok' ? 'var(--accent)' : 'var(--accent3)';
+            progressLog.appendChild(log);
+            progressLog.scrollTop = progressLog.scrollHeight;
+          }
+        } catch(e) {}
+      }
+    }
+  } catch(e) {
+    batchError.textContent = '⚠️ ' + e.message;
+    batchError.classList.add('show');
+  } finally {
+    btn.disabled = false; btn.textContent = '📅 Generate 30-Day Content Pack';
+  }
 }
 
 function copyEl(id, btn) {
   const text = document.getElementById(id).textContent.trim();
   navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = '✓ Copied';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    btn.textContent = '✓ Copied'; btn.classList.add('copied');
+    setTimeout(() => {btn.textContent = 'Copy'; btn.classList.remove('copied')}, 2000);
   });
 }
 </script>
