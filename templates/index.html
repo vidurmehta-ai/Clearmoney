@@ -259,7 +259,7 @@
       </div>
     </div>
   </div>
-
+<a id="dlBtn" style="display:none;width:100%;padding:16px;background:#00e5a0;color:#0a0a0f;font-family:Syne,sans-serif;font-weight:700;font-size:16px;border-radius:14px;text-align:center;text-decoration:none;margin-bottom:28px;display:none;cursor:pointer;" >⬇️ Download Carousel ZIP (9 Images Ready)</a>
   <div class="footer">ClearMoney Weekly © 2026 — Powered by Claude AI</div>
 </div>
 
@@ -348,6 +348,8 @@ function render(data) {
 
   document.getElementById('output').classList.add('show');
   document.getElementById('output').scrollIntoView({ behavior: 'smooth' });
+  document.getElementById('dlBtn').style.display = 'block';
+document.getElementById('dlBtn').href = '/download/' + data.zip_token;
 }
 
 function copyEl(id, btn) {
